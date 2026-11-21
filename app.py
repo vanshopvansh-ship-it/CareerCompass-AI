@@ -16,18 +16,21 @@ st.set_page_config(
 
 load_dotenv()
 
-api_key = os.getenv("GROQ_API_KEY")
+api_key = None
+
+try:
+    api_key = st.secrets.get("GROQ_API_KEY")
+except Exception:
+    pass
 
 if not api_key:
-    st.error("Groq API key not found. Please check your .env file.")
+    api_key = os.getenv("GROQ_API_KEY")
+
+if not api_key:
+    st.error("Groq API key not found!")
     st.stop()
 
 client = Groq(api_key=api_key)
-st.set_page_config(
-    page_title="CareerCompass AI",
-    page_icon="🧭",
-    layout="wide"
-)
 st.markdown("""
 <style>
 .stApp {
