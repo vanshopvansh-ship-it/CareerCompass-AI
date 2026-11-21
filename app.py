@@ -274,41 +274,39 @@ if user_question:
         {"role": "user", "content": user_question}
     )
 
-    with st.chat_message("user"):
-        st.write(user_question)
-
     try:
-        with st.chat_message("assistant"):
-            with st.spinner("AI is thinking..."):
+        with st.spinner("AI is thinking..."):
 
-                messages = [
-                    {
-                        "role": "system",
-                        "content": (
-                            "You are CareerCompass AI, a helpful career "
-                            "guidance assistant for students. Give clear, "
-                            "friendly and personalized career advice. "
-                            "Explain skills, courses, projects and roadmaps "
-                            "in simple language."
-                        )
-                    }
-                ]
+            messages = [
+                {
+                    "role": "system",
+                    "content": (
+                        "You are CareerCompass AI, a helpful career "
+                        "guidance assistant for students. Give clear, "
+                        "friendly and personalized career advice. "
+                        "Explain skills, courses, projects and roadmaps "
+                        "in simple language."
+                    )
+                }
+            ]
 
-                messages.extend(st.session_state.chat_history)
+            messages.extend(st.session_state.chat_history)
 
-                response = client.chat.completions.create(
-                    model="openai/gpt-oss-120b",
-                    messages=messages,
-                    temperature=0.7,
-                    max_tokens=1000
+            response = client.chat.completions.create(
+                model="openai/gpt-oss-120b",
+                messages=messages,
+                temperature=0.7,
+                max_tokens=1000
+            )
+
+            answer = response.choices[0].message.content
+
+            if not answer:
+                st.error("AI returned an empty response. Please try again.")
+            else:
+                st.session_state.chat_history.append(
+                    {"role": "assistant", "content": answer}
                 )
-
-                answer = response.choices[0].message.content
-                st.write(answer)
-
-        st.session_state.chat_history.append(
-            {"role": "assistant", "content": answer}
-        )
 
     except Exception as e:
         st.error(f"AI Error: {e}")
